@@ -3,6 +3,7 @@ require_once "../include/database/Course.php";
 
 if (isset($_POST['name']))
 {
+    //add new course
     if (Course::add($_POST['id'], $_POST['name'], $_POST['tid']))
     {
         echo "Succeeded to add course";

@@ -27,10 +27,12 @@ class Student_Assignment
         }
     }
 
-    public static function delete_by_sid($sid)
+    public static function delete_by_sid($conn, $sid)
     {
         try {
-            $conn = connect();
+            if ($conn == null)
+                $conn = connect();
+            Student_Question::delete_by_sid($conn, $sid);
             $q = $conn->prepare("DELETE FROM Student_Assignment WHERE sid=?");
             $q->bindParam(1, $sid);
             $q->execute();
@@ -126,15 +128,17 @@ class Student_Assignment
     {
         try
         {
+            //update answers
             $conn = connect();
             Student_Question::update($conn, $aid, $sid, $qids, $answers);
             if ($submit == 1)
             {
+                //submit
                 $q = $conn->prepare("UPDATE Student_Assignment SET submit_date=? WHERE aid=? AND sid=?");
                 $q->bindParam(1, $date);
                 $q->bindParam(2, $aid);
                 $q->bindParam(3, $sid);
-                return $q->execute();
+                $q->execute();
             }
             $conn = null;
             return true;
@@ -146,14 +150,16 @@ class Student_Assignment
         }
     }
 
-    public static function mark($sid, $aid, $mark, $qids, $qmarks)
+    public static function mark($sid, $aid, $mark, $qids, $qmarks, $comment)
     {
+        //update student's mark
         try {
             $conn = connect();
-            $q = $conn->prepare("UPDATE Student_Assignment SET mark=? WHERE sid=? AND aid=?");
+            $q = $conn->prepare("UPDATE Student_Assignment SET mark=?, comment=? WHERE sid=? AND aid=?");
             $q->bindParam(1, $mark);
-            $q->bindParam(2, $sid);
-            $q->bindParam(3, $aid);
+            $q->bindParam(2, $comment);
+            $q->bindParam(3, $sid);
+            $q->bindParam(4, $aid);
             $q->execute();
             Student_Question::marks($conn, $sid, $aid, $qids, $qmarks);
             $conn = null;

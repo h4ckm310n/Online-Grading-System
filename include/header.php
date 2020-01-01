@@ -9,11 +9,12 @@ function display_header()
     <div>
         <nav class="navbar navbar-expand-md bg-secondary navbar-dark fixed-top">
             <div class="container">
-                <a class="nav-brand" style="color: white">Online Grading System</a>
+                <a class="nav-brand" style="color: white" href="<?php echo $host; ?>">Online Grading System</a>
                 <ul class="navbar-nav mr-auto">
                     <?php
                     if (check_auth() == 1)
                     {
+                        // if user is a teacher, show student link
                         ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo $host; ?>/student/list.php">Students</a>

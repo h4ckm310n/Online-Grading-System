@@ -4,21 +4,6 @@ require_once "Student_Question.php";
 
 class Question
 {
-    public static function select($aid)
-    {
-        try {
-            $conn = connect();
-            $q = $conn->query("SELECT * FROM Questions WHERE aid='$aid'");
-            $conn = null;
-            return $q->fetchAll();
-        }
-        catch (PDOException $e)
-        {
-            $conn = null;
-            return false;
-        }
-    }
-
     public static function add_questions($conn, $aid, $contents, $weights)
     {
         try
@@ -52,7 +37,7 @@ class Question
         {
             if ($conn == null)
                 $conn = connect();
-            Student_Question::delete($conn, $aid);
+            Student_Question::delete_by_aid($conn, $aid);
             $q = $conn->prepare("DELETE FROM Questions WHERE aid=?");
             $q->bindParam(1, $aid);
             $q->execute();

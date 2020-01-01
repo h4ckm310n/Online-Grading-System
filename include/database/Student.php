@@ -20,22 +20,6 @@ class Student
         }
     }
 
-    public static function select_by_id($sid)
-    {
-        try {
-            $conn = connect();
-            $q = $conn->query("SELECT * FROM Students WHERE sid='$sid' ORDER BY sid");
-            $row = $q->fetch();
-            $conn = null;
-            return $row;
-        }
-        catch (PDOException $e)
-        {
-            $conn = null;
-            return false;
-        }
-    }
-
     private static function sid_exist($conn, $sid)
     {
         $q = $conn->prepare("SELECT COUNT(*) AS N FROM Students WHERE sid=?");

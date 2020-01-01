@@ -4,12 +4,16 @@ require_once "../include/check_auth.php";
 if (check_auth() == 0)
     end_page();
 
+//list assignments
 require_once "../include/database/Assignment.php";
 if (isset($_GET['cid']))
+    //assignments of certain course
     $list_results = Assignment::select_by_course($_GET['cid'], $_SESSION['uid'], $_SESSION['urole']);
 else if (check_auth() == 1)
+    //assignments of all courses taught by current teacher account
     $list_results = Assignment::select_by_teacher($_SESSION['uid']);
 else
+    //assignments of all courses taken by current student account
     $list_results = Assignment::select_by_student($_SESSION['uid']);
 ?>
 <html>
@@ -27,6 +31,7 @@ display_header();
 <div class="container" style="background-color: white">
     <?php
     if (check_auth() == 1) {
+        //if user is a teacher, show button to add assignment
         ?>
         <div style="padding-top: 3px; margin-bottom: 3px">
             <hr>
@@ -45,6 +50,7 @@ display_header();
             <?php
                 if (check_auth() == 2)
                 {
+                    //if user is a student, show whether the assignment is submitted
                     echo '<th>Submitted</th>';
                 }
             ?>
@@ -63,6 +69,7 @@ display_header();
                 {
                     if ($row['submitted'] == 1)
                     {
+                        //whether assignment is submitted
                         echo '<td><a style="color: cornflowerblue">YES</a></td>';
                         echo '<td>
                                 <button type="button" class="btn btn-primary" 
@@ -81,6 +88,7 @@ display_header();
 
                 }
                 if (check_auth() == 1) {
+                    //if user is a teacher, show button to list students who submitted assignment, and button to delete assignment
                     ?>
                     <td>
                         <button type="button" class="btn btn-primary"
@@ -105,6 +113,7 @@ display_header();
 
 <?php
 if (check_auth() == 1) {
+    //teacher
     ?>
     <div class="modal fade" id="add_assignment_modal" data-backdrop="static">
         <div class="modal-dialog" style="background-color: white">
@@ -131,6 +140,7 @@ if (check_auth() == 1) {
                             <div class="col-md-5">
                                 <input id="add_cid" name="add_cid" type="text" class="form-control" required="required"
                                     <?php
+                                    //if exists the cid param
                                     if (isset($_GET['cid']))
                                         echo 'value="'.$_GET['cid'].'" readonly="readonly"'
                                     ?>>
@@ -170,6 +180,7 @@ if (check_auth() == 1) {
 
     <script>
         function addQuestion() {
+            //add more questions
             var new_q;
             var last_qid = $('.q_textarea:last').attr('name');
             if (last_qid == undefined)
@@ -191,14 +202,17 @@ if (check_auth() == 1) {
         }
 
         function addModal() {
+            //initialize the modal to add assignment
             $('#add_a_q_container').html('');
             for (var i=0; i<5; ++i)
+                //5 questions by default
                 addQuestion();
             $('#add_assignment_modal').modal('show');
 
         }
 
         function addAssignment() {
+            //add assignment
             var contents = [];
             var weights = [];
             $('.q_textarea').each(
@@ -227,6 +241,7 @@ if (check_auth() == 1) {
         }
 
         function delAssignment(aid) {
+            //delete assignment
             var flag = confirm("Confirm Delete");
             if (flag) {
                 $.post("delete.php",
@@ -241,6 +256,7 @@ if (check_auth() == 1) {
         }
 
         function lstStudent(aid) {
+            //list students who submitted assignment
             $.post("student.php",
                 {
                     aid: aid,
@@ -254,36 +270,23 @@ if (check_auth() == 1) {
             );
         }
 
-        function updateMark(aid) {
-            var all_sid = [];
-            var all_mark = [];
-            $("select[name^='mark_']").each(
-                function () {
-                    all_sid.push($(this).attr('name').replace('mark_', ''));
-                    all_mark.push($(this).val());
-                }
-            );
-            $.post("student.php",
-                {
-                    sids: all_sid,
-                    marks: all_mark,
-                    aid: aid,
-                    mode: 2
-                },
-                function(data, status)
-                {
-                    alert(data);
-                }
-            );
-        }
-
         function delQuestion(qid) {
+            //delete question
             var div_id = qid.replace('q_content', 'div_q');
             $('#' + div_id).remove();
         }
 
         function viewAssignment(aid, sid) {
+            //view assignment of certain student
             var div = $('#div_view_t_a');
+            div.slideUp();
+            if (div.attr('data-sid') == sid && div.attr('data-aid') == aid) {
+                div.attr('data-sid', '');
+                div.attr('data-aid', '');
+                return;
+            }
+            div.attr('data-sid', sid);
+            div.attr('data-aid', aid);
             $.post('detail.php',
                 {
                     mode: 3,
@@ -292,13 +295,14 @@ if (check_auth() == 1) {
                 },
                 function (data, status) {
                     div.html(data);
+                    div.slideDown('slow');
                     calTotalMark();
-                    div.slideDown();
                 }
             );
         }
 
         function setStudentMark(aid, sid) {
+            //set student's mark of certain assignment
             var qids = [];
             var qmarks = [];
             $('.q_mark_input').each(
@@ -314,6 +318,7 @@ if (check_auth() == 1) {
                     aid: aid,
                     qids: qids,
                     qmarks: qmarks,
+                    comment: $('#assignment_comment_text').val(),
                     mode: 2
                 },
                 function(data, status)
@@ -325,12 +330,14 @@ if (check_auth() == 1) {
         }
 
         function hideAssignment() {
+            //hide the student's assignment
             var div = $('#div_view_t_a');
             div.slideUp();
             div.html('');
         }
 
         function calTotalMark() {
+            //calculate the mark of assignment by adding all marks of questions
             var total = 0;
             $('.q_mark_input').each(
                 function () {
@@ -346,6 +353,7 @@ if (check_auth() == 1) {
 
 else if (check_auth() == 2)
 {
+    //student
     ?>
     <div class="modal fade" id="student_assignment_modal" data-backdrop="static">
         <div class="modal-dialog" style="background-color: white">
@@ -362,6 +370,7 @@ else if (check_auth() == 2)
 
     <script>
         function viewAssignment(aid) {
+            //if submitted, student can view the answer and mark of assignment
             $.post("detail.php",
                 {
                     mode: 1,
@@ -377,6 +386,7 @@ else if (check_auth() == 2)
         }
 
         function editAssignment(aid) {
+            //if not submitted, student can edit the answer of assignment
             $.post("detail.php",
                 {
                     mode: 2,
@@ -397,6 +407,7 @@ else if (check_auth() == 2)
         }
 
         function saveAssignment(aid, submit) {
+            //save answers of assignment
             var date = new Date();
             var day = ("0" + date.getDate()).slice(-2);
             var month = ("0" + (date.getMonth() + 1)).slice(-2);
@@ -412,6 +423,7 @@ else if (check_auth() == 2)
                 }
             );
             if (submit == 1)
+                //submit
                 flag = confirm("Confirm to submit. You can not change your answers after submitted.");
             else
                 flag = true;

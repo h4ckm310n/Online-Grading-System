@@ -9,6 +9,8 @@ require_once "../include/database/Student_Assignment.php";
 
 function list_student($cid)
 {
+    //list all students taking certain course
+
     $grade_enum = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F', 'U'];
     $list_results = Student_Course::select_by_course($cid);
     ?>
@@ -42,6 +44,7 @@ function list_student($cid)
             foreach ($grade_enum as $g)
             {
                 if ($g == $row['grade'])
+                    //default option is the grade of student
                     $option_selected = " selected";
                 else
                     $option_selected = "";
@@ -61,6 +64,7 @@ function list_student($cid)
 
 function add_student($sid, $cid)
 {
+    //add student to course
     if (Student_Course::add($sid, $cid))
         echo "Succeeded to add student";
     else
@@ -69,6 +73,7 @@ function add_student($sid, $cid)
 
 function del_student($sid, $cid)
 {
+    //delete student from course
     if (Student_Course::delete($sid, $cid))
         echo "Succeeded to delete student";
     else
@@ -77,14 +82,17 @@ function del_student($sid, $cid)
 
 function update_grades($sids, $cid, $grades)
 {
+    //update all grades of students who take certain course
     if (Student_Course::grades($sids, $cid, $grades))
-        echo "Succeded to set students' grades";
+        echo "Succeeded to set students' grades";
     else
         echo "Failed to set students' grades";
 }
 
 function view_grade($sid, $cid)
 {
+    //view self's grade of certain course, and mark of each assignment
+
     $sc = Student_Course::select_by_sid_cid($sid, $cid);
     $sa = Student_Assignment::select_by_sid_cid($sid, $cid);
     echo '<div>

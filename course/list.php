@@ -4,14 +4,14 @@ require_once "../include/check_auth.php";
 if (check_auth() == 0)
     end_page();
 
-
+//list courses
 require_once "../include/database/Course.php";
 
 if (check_auth() == 1)
     //courses taught by current teacher account
     $list_results = Course::select_by_teacher();
 else
-    //courses current student account is studying
+    //courses taken by current student account
     $list_results = Course::select_by_student();
 ?>
 <html>
@@ -29,6 +29,7 @@ display_header();
 <div class="container" style="background-color: white">
     <?php
     if (check_auth() == 1) {
+        //if user is a teacher, show a button to add new course
         ?>
         <div style="padding-top: 3px; margin-bottom: 3px">
             <hr>
@@ -96,6 +97,7 @@ display_header();
 
 <?php
 if (check_auth() == 1) {
+    //teacher
     ?>
     <div class="modal fade" id="add_course_modal" data-backdrop="static">
         <div class="modal-dialog" style="background-color: white">
@@ -146,6 +148,7 @@ if (check_auth() == 1) {
 
     <script>
         function addCourse() {
+            //add new course
             $.post("add.php",
                 {
                     id: $('#add_id').val(),
@@ -160,6 +163,7 @@ if (check_auth() == 1) {
         }
 
         function delCourse(cid) {
+            //delete course
             var flag = confirm("Confirm Delete");
             if (flag) {
                 $.post("delete.php",
@@ -174,6 +178,7 @@ if (check_auth() == 1) {
         }
 
         function lstStudent(cid) {
+            //list students who take certain course
             $.post("student.php",
                 {
                     cid: cid,
@@ -188,6 +193,7 @@ if (check_auth() == 1) {
         }
 
         function addStudent(cid) {
+            //add student to certain course
             $.post("student.php",
                 {
                     cid: cid,
@@ -203,6 +209,7 @@ if (check_auth() == 1) {
         }
 
         function delStudent(sid, cid) {
+            //delete student from certain course
             var flag = confirm("Confirm Delete");
             if (flag) {
                 $.post("student.php",
@@ -219,6 +226,7 @@ if (check_auth() == 1) {
         }
 
         function updateGrade(cid) {
+            //update grades of all students having certain course
             var all_sid = [];
             var all_grade = [];
             $("select[name^='grade_']").each(
@@ -246,6 +254,7 @@ if (check_auth() == 1) {
 
 else
 {
+    //student
     ?>
     <div class="modal fade" id="grade_modal">
         <div class="modal-dialog">
@@ -260,6 +269,7 @@ else
 
     <script>
         function viewGrade(sid, cid) {
+            //view grade of certain course and mark of each assignment
             $.post("student.php",
                 {
                     mode: 5,

@@ -1,6 +1,6 @@
 <?php
 require_once "db_connect.php";
-
+require_once "Student_Assignment.php";
 
 class Student_Course
 {
@@ -123,6 +123,7 @@ class Student_Course
     {
         try {
             $conn = connect();
+            Student_Assignment::delete_by_sid($conn, $sid);
             $q = $conn->prepare("DELETE FROM Student_Course WHERE sid=?");
             $q->bindParam(1, $sid);
             $q->execute();

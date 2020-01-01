@@ -5,6 +5,8 @@ require_once "../include/database/Student_Assignment.php";
 
 function student_edit($aid)
 {
+    //if not submitted, student can edit answers
+
     $sa = Student_Assignment::select_by_aid_sid($aid, $_SESSION['uid']);
     $sq = Student_Question::select_by_aid_sid($aid, $_SESSION['uid']);
     ?>
@@ -36,6 +38,7 @@ function student_edit($aid)
 
 function student_view($aid)
 {
+    //if submitted, student can view answers and mark, but cannot edit
     $sa = Student_Assignment::select_by_aid_sid($aid, $_SESSION['uid']);
     $sq = Student_Question::select_by_aid_sid($aid, $_SESSION['uid']);
     ?>
@@ -47,7 +50,7 @@ function student_view($aid)
         </div>
         <hr>
         <div>
-            <pre><?php echo $sa['comment']; ?></pre>
+            <pre style="font-size: 15px"><?php echo $sa['comment']; ?></pre>
         </div>
     </div>
     <div>
@@ -73,7 +76,7 @@ function teacher_student($aid, $sid)
     $sq = Student_Question::select_by_aid_sid($aid, $sid);
     ?>
     <div>
-        <div>
+        <div class="container">
             <h4><?php echo $sa['title']; ?></h4>
             <div style="padding: 3px">
                 <a style="padding: 2px;">Student ID: <?php echo $sid; ?></a><br>
@@ -81,14 +84,18 @@ function teacher_student($aid, $sid)
                 <b>Total Mark: </b>
                 <b id="total_mark_b"></b>
             </div>
+            <div class="form-group">
+                <textarea class="form-control" rows=3 id="assignment_comment_text" placeholder="Comment"><?php echo $sa['comment']; ?></textarea>
+            </div>
             <button type="button" class="btn btn-secondary" onclick="hideAssignment()">Cancel</button>
             <hr>
         </div>
-        <form>
-            <?php
-            foreach ($sq as $row)
-            {
-                echo '<div>
+        <div class="container">
+            <form>
+                <?php
+                foreach ($sq as $row)
+                {
+                    echo '<div>
                     <pre style="font-size: 16px">Q:
 '.$row['content'].'</pre>
                     <pre style="font-size: 15px; color: red">A:
@@ -97,10 +104,11 @@ function teacher_student($aid, $sid)
                     <input type="number" class="form-control q_mark_input" id="q_mark_input_'.$row['qid'].'" 
                       name="q_mark_'.$row['qid'].'" value="'.$row['mark'].'" onchange="calTotalMark()">
                   </div><hr>';
-            }
-            echo '<button type="button" class="btn btn-primary" onclick="setStudentMark(\''.$aid.'\', \''.$sid.'\')">Update Mark</button>'
-            ?>
-        </form>
+                }
+                echo '<button type="button" class="btn btn-primary" onclick="setStudentMark(\''.$aid.'\', \''.$sid.'\')">Update Mark</button>'
+                ?>
+            </form>
+        </div>
     </div>
     <?php
 

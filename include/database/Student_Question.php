@@ -28,13 +28,29 @@ class Student_Question
         }
     }
 
-    public static function delete($conn, $aid)
+    public static function delete_by_aid($conn, $aid)
     {
         try {
             if ($conn == null)
                 $conn = connect();
             $q = $conn->prepare("DELETE FROM Student_Question WHERE aid=?");
             $q->bindParam(1, $aid);
+            $q->execute();
+            return true;
+        }
+        catch (PDOException $e)
+        {
+            return false;
+        }
+    }
+
+    public static function delete_by_sid($conn, $sid)
+    {
+        try {
+            if ($conn == null)
+                $conn = connect();
+            $q = $conn->prepare("DELETE FROM Student_Question WHERE sid=?");
+            $q->bindParam(1, $sid);
             $q->execute();
             return true;
         }

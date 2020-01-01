@@ -39,50 +39,6 @@ class User
         }
     }
 
-    private static function tid_exist($conn, $tid)
-    {
-        $q = $conn->prepare("SELECT COUNT(*) AS N FROM Teachers WHERE tid=?");
-        $q->bindParam(1, $tid);
-        $q->execute();
-        $row = $q->fetch();
-        if ($row['N'] > 0)
-            return true;
-        return false;
-    }
-
-    public static function register($uname, $pwd, $phone, $email, $office)
-    {
-        try {
-            $conn = connect();
-            while (true) {
-                $tid = 'T' . substr(str_shuffle('0123456789'), 0, 6);
-                if (!self::tid_exist($conn, $tid))
-                    break;
-            }
-
-            //insert
-            $q = $conn->prepare("INSERT INTO Teachers(tid, password, name, phone, email, office) VALUES (?, ?, ?, ?, ?, ?)");
-            $q->bindParam(1, $tid);
-            $q->bindParam(2, $pwd);
-            $q->bindParam(3, $uname);
-            $q->bindParam(4, $phone);
-            $q->bindParam(5, $email);
-            $q->bindParam(6, $office);
-            $q->execute();
-            $conn = null;
-            $_SESSION['uid'] = $tid;
-            $_SESSION['uname'] = $uname;
-            $_SESSION['urole'] = 1;
-            $_SESSION['login'] = true;
-            return true;
-        }
-        catch (PDOException $e)
-        {
-            $conn = null;
-            return false;
-        }
-    }
-
     public static function update($uid, $name, $pwd, $phone, $email, $office, $role)
     {
         try {

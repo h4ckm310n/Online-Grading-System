@@ -76,12 +76,6 @@ else {
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-primary">Login</button>
                 </div>
-                <div class="col-md-1"></div>
-                <div class="col-md-1">
-                    <a href="register.php">
-                        <button type="button" class="btn btn-primary">Register</button>
-                    </a>
-                </div>
             </div>
         </form>
     </div>
