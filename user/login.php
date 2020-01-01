@@ -24,7 +24,7 @@ else if (isset($_POST['uid']) && isset($_POST['pwd']))
         <body>
         <script>
             alert('Wrong user ID or password! ');
-            location.reload();
+            window.location.href='login.php';
         </script>
         </body>
         </html>

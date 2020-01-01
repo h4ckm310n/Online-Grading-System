@@ -13,9 +13,9 @@ class Assignment
             $q = $conn->query("SELECT A.aid, A.title, C.cid, A.deadline FROM Assignments AS A 
                                          JOIN Courses AS C
                                          ON C.cid=A.cid
-                                         JOIN Teachers AS T
-                                         ON C.tid=T.tid
-                                         WHERE T.tid='$tid'");
+                                         JOIN Users AS U
+                                         ON C.tid=U.uid
+                                         WHERE U.uid='$tid'");
             $conn = null;
             return $q->fetchAll();
         }

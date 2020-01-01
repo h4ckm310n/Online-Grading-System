@@ -7,24 +7,10 @@ class User
     {
         try {
             $conn = connect();
-            switch ($role) {
-                case 1:
-                    $s = "SELECT COUNT(*) as N, T.tid, name FROM Teachers AS T
-                          JOIN Users AS U ON T.tid=U.uid
-                          WHERE T.tid=? AND U.password=?";
-                    break;
-                case 2:
-                    $s = "SELECT COUNT(*) as N, S.sid, name FROM Students AS S
-                          JOIN Users AS U ON S.sid=U.uid
-                          WHERE S.sid=? AND U.password=?";
-                    break;
-                default:
-                    $s = "";
-                    break;
-            }
-            $q = $conn->prepare($s);
+            $q = $conn->prepare("SELECT COUNT(*) as N, uid, name FROM Users WHERE uid=? AND password=? AND role=?");
             $q->bindParam(1, $uid);
             $q->bindParam(2, $pwd);
+            $q->bindParam(3, $role);
             $q->execute();
             $row = $q->fetch();
             $conn = null;

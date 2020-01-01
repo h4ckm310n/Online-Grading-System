@@ -8,9 +8,7 @@ class Student
     {
         try {
             $conn = connect();
-            $q = $conn->query("SELECT * FROM Users AS U
-                                         JOIN Students AS S ON S.sid=U.uid 
-                                         ORDER BY S.sid");
+            $q = $conn->query("SELECT * FROM Users WHERE role=2 ORDER BY uid");
             $rows = $q->fetchAll();
             $conn = null;
             return $rows;
@@ -24,7 +22,7 @@ class Student
 
     private static function sid_exist($conn, $sid)
     {
-        $q = $conn->prepare("SELECT COUNT(*) AS N FROM Students WHERE sid=?");
+        $q = $conn->prepare("SELECT COUNT(*) AS N FROM Users WHERE uid=?");
         $q->bindParam(1, $sid);
         $q->execute();
         $row = $q->fetch();
@@ -51,9 +49,6 @@ class Student
             $q->bindParam(4, $phone);
             $q->bindParam(5, $email);
             $q->execute();
-            $q2 = $conn->prepare("INSERT INTO Students VALUES ?");
-            $q2->bindParam(1, $sid);
-            $q2->execute();
             $conn = null;
             return true;
         }
@@ -69,12 +64,9 @@ class Student
         try {
             $conn = connect();
             Student_Course::delete_by_sid($sid);
-            $q = $conn->prepare("DELETE FROM Students WHERE sid=?");
+            $q = $conn->prepare("DELETE FROM Users WHERE uid=?");
             $q->bindParam(1, $sid);
             $q->execute();
-            $q2 = $conn->prepare("DELETE FROM Users WHERE uid=?");
-            $q2->bindParam(1, $sid);
-            $q2->execute();
             $conn = null;
             return true;
         }

@@ -16,7 +16,7 @@ class Student_Assignment
             $q->bindParam(2, $aid);
             foreach ($students as $s_row)
             {
-                $sid = $s_row['sid'];
+                $sid = $s_row['uid'];
                 $q->execute();
             }
             return true;

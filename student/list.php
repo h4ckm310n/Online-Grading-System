@@ -39,12 +39,12 @@ display_header();
         {
             ?>
             <tr>
-                <td><?php echo $row['sid']; ?></td>
+                <td><?php echo $row['uid']; ?></td>
                 <td><?php echo $row['name']; ?></td>
                 <td><?php echo $row['phone']; ?></td>
                 <td><?php echo $row['email']; ?></td>
                 <td>
-                    <button type="button" class="btn btn-danger" onclick="delStudent('<?php echo $row['sid']; ?>')">Delete</button>
+                    <button type="button" class="btn btn-danger" onclick="delStudent('<?php echo $row['uid']; ?>')">Delete</button>
                 </td>
             </tr>
             <?php
