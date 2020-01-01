@@ -187,9 +187,9 @@ if (check_auth() == 1) {
                 last_qid = 'q_content_0';
             var new_qid = 'q_content_' + String(Number(last_qid.replace('q_content_', '')) + 1);
             new_q = '<div class="form-group" id="' + new_qid.replace('q_content', 'div_q') +'">\
-                        <label for="' + new_qid + '">Content: </label>\
+                        <label for="' + new_qid + '">Question Description: </label>\
                         <textarea class="form-control q_textarea" id="' + new_qid + '" \
-                            name="' + new_qid + '" style="margin-bottom: 5px;"></textarea>\
+                            name="' + new_qid + '" style="margin-bottom: 5px;" placeholder="Question Description" textarea>\
                         <div class="row container">\
                         <input class="form-control q_weight" type="number" name="' + new_qid.replace('q_content', 'weight') + '" \
                             style="margin-right: 5px; width: 100px" placeholder="Weight">\
