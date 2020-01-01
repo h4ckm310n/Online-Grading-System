@@ -124,6 +124,41 @@ class Student_Assignment
         }
     }
 
+    public static function select_avg_by_sid($sid, $cid)
+    {
+        try
+        {
+            $conn = connect();
+            $q = $conn->query("SELECT AVG(SA.mark) AS avg FROM Student_Assignment AS SA
+                                         JOIN Assignments AS A ON SA.aid=A.aid
+                                         WHERE A.cid='$cid' AND SA.sid='$sid'");
+            $conn = null;
+            return $q->fetch();
+        }
+        catch (PDOException $e)
+        {
+            return false;
+        }
+    }
+
+    public static function select_avg($cid)
+    {
+        try
+        {
+            $conn = connect();
+            $q = $conn->query("SELECT AVG(SA.mark) AS avg FROM Student_Assignment AS SA 
+                                         JOIN Assignments AS A ON SA.aid=A.aid 
+                                         WHERE A.cid='$cid' 
+                                         GROUP BY(SA.sid)");
+            $conn = null;
+            return $q->fetchAll();
+        }
+        catch (PDOException $e)
+        {
+            return false;
+        }
+    }
+
     public static function update($aid, $sid, $qids, $answers, $date, $submit)
     {
         try

@@ -13,6 +13,7 @@ function list_student($cid)
 
     $grade_enum = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F', 'U'];
     $list_results = Student_Course::select_by_course($cid);
+    $list_avg = Student_Assignment::select_avg($cid);
     ?>
     <div style="padding-top: 3px; margin-bottom: 3px">
         <hr>
@@ -22,6 +23,7 @@ function list_student($cid)
                 <button class="btn btn-primary" onclick="addStudent('<?php echo $cid; ?>')">Add
                 </button>
             </div>
+            <div class="col-md-1"></div>
             <div>
                 <button class="btn btn-primary" onclick="updateGrade('<?php echo $cid; ?>')">Update Grades</button>
             </div>
@@ -33,10 +35,13 @@ function list_student($cid)
             <th>ID</th>
             <th>Name</th>
             <th>Grade</th>
+            <th>Average</th>
             <th>Delete</th>
         </tr>
         <?php
-        foreach ($list_results as $row) {
+        for ($i=0;$i<count($list_results); ++$i) {
+        //foreach ($list_results as $row) {
+            $row = $list_results[$i];
             echo '<tr>';
             echo '<td>' . $row['sid'] . '</td>';
             echo '<td>' . $row['name'] . '</td>';
@@ -51,6 +56,7 @@ function list_student($cid)
                 echo '<option value="'.$g.'"'.$option_selected.'>'.$g.'</option>';
             }
             echo '</select></td>';
+            echo '<td>'.$list_avg[$i]['avg'].'</td>';
             echo '<td>
                 <button type="button" class="btn btn-danger"
                         onclick="delStudent(\'' . $row['sid'] . '\',\'' . $cid . '\')">Delete</button>
@@ -95,9 +101,11 @@ function view_grade($sid, $cid)
 
     $sc = Student_Course::select_by_sid_cid($sid, $cid);
     $sa = Student_Assignment::select_by_sid_cid($sid, $cid);
+    $avg = Student_Assignment::select_avg_by_sid($sid, $cid)['avg'];
     echo '<div>
             <h4>'.$cid.'     '.$sc['name'].'</h4>
             <br><a>Grade: '.$sc['grade'].'</a>
+            <br><a>Average Mark: '.$avg.'</a>
          </div><hr>';
     ?>
     <table class="table table-striped">

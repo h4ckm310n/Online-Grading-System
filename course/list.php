@@ -135,7 +135,7 @@ if (check_auth() == 1) {
     </div>
 
     <div class="modal fade" id="list_student">
-        <div class="modal-dialog" style="background-color: white">
+        <div class="modal-dialog modal-lg" style="background-color: white">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Students</h4>
