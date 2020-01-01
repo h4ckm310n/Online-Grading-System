@@ -2,7 +2,7 @@
 session_start();
 require_once "../include/database/User.php";
 require_once "../include/check_auth.php";
-$row = User::select_by_uid($_SESSION['uid'], $_SESSION['urole']);
+$row = User::select_by_uid($_SESSION['uid']);
 
 if ($row)
 {
@@ -37,19 +37,6 @@ if ($row)
                        value="<?php echo $row['email']; ?>">
             </div>
         </div>
-        <?php
-        if (check_auth() == 1) {
-            ?>
-            <div class="form-group row">
-                <label class="col-md-4 col-form-label" for="edit_user_office">Office: </label>
-                <div class="col-md-5">
-                    <input id="edit_user_office" name="edit_user_office" type="text" class="form-control" required="required"
-                           value="<?php echo $row['office']; ?>">
-                </div>
-            </div>
-            <?php
-        }
-        ?>
         <div class="form-group row">
             <div class="col-md-4"></div>
             <div class="col-md-2">

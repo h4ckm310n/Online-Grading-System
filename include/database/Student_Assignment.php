@@ -66,10 +66,10 @@ class Student_Assignment
     {
         try {
             $conn = connect();
-            $q = $conn->query("SELECT S.sid, S.name, SA.mark, IFNULL(SA.submit_date, 'NULL') AS submit_date 
-                                         FROM Students AS S 
-                                         JOIN Student_Assignment AS SA ON S.sid=SA.sid
-                                         WHERE SA.aid='$aid' ORDER BY S.sid");
+            $q = $conn->query("SELECT U.uid, U.name, SA.mark, IFNULL(SA.submit_date, 'NULL') AS submit_date 
+                                         FROM Users AS U 
+                                         JOIN Student_Assignment AS SA ON U.uid=SA.sid
+                                         WHERE SA.aid='$aid' ORDER BY U.uid");
             $rows = $q->fetchAll();
             $conn = null;
             return $rows;

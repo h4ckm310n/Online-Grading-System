@@ -27,11 +27,11 @@ function list_student($aid)
                 continue;
             }
             echo '<tr>';
-            echo '<td>' . $row['sid'] . '</td>';
+            echo '<td>' . $row['uid'] . '</td>';
             echo '<td>' . $row['name'] . '</td>';
             echo '<td>'.$row['mark'].'</td>';
             echo '<td>'.$row['submit_date'].'</td>';
-            echo '<td><button class="btn btn-primary" onclick="viewAssignment(\''.$aid.'\', \''.$row['sid'].'\')">View</button></td>';
+            echo '<td><button class="btn btn-primary" onclick="viewAssignment(\''.$aid.'\', \''.$row['uid'].'\')">View</button></td>';
             echo '</tr><br>';
         }
         ?>

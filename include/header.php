@@ -76,20 +76,12 @@ function display_header()
         }
 
         function updateUser() {
-            var office;
-            <?php
-                if (check_auth() == 1)
-                    echo "office = $('#edit_user_office').val();";
-                else
-                    echo "office = '';";
-            ?>
             $.post("<?php echo $host; ?>/user/setting.php",
                     {
                         name: $('#edit_user_name').val(),
                         pwd: $('#edit_user_password').val(),
                         phone: $('#edit_user_phone').val(),
                         email: $('#edit_user_email').val(),
-                        office: office
                     },
                     function(data, status)
                     {

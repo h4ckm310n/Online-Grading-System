@@ -8,7 +8,9 @@ class Student
     {
         try {
             $conn = connect();
-            $q = $conn->query("SELECT * FROM Students ORDER BY sid");
+            $q = $conn->query("SELECT * FROM Users AS U
+                                         JOIN Students AS S ON S.sid=U.uid 
+                                         ORDER BY S.sid");
             $rows = $q->fetchAll();
             $conn = null;
             return $rows;
@@ -42,13 +44,16 @@ class Student
             }
 
             //insert
-            $q = $conn->prepare("INSERT INTO Students(sid, password, name, phone, email) VALUES (?, ?, ?, ?, ?)");
+            $q = $conn->prepare("INSERT INTO Users(uid, password, name, phone, email) VALUES (?, ?, ?, ?, ?)");
             $q->bindParam(1, $sid);
             $q->bindParam(2, $pwd);
             $q->bindParam(3, $name);
             $q->bindParam(4, $phone);
             $q->bindParam(5, $email);
             $q->execute();
+            $q2 = $conn->prepare("INSERT INTO Students VALUES ?");
+            $q2->bindParam(1, $sid);
+            $q2->execute();
             $conn = null;
             return true;
         }
@@ -67,6 +72,9 @@ class Student
             $q = $conn->prepare("DELETE FROM Students WHERE sid=?");
             $q->bindParam(1, $sid);
             $q->execute();
+            $q2 = $conn->prepare("DELETE FROM Users WHERE uid=?");
+            $q2->bindParam(1, $sid);
+            $q2->execute();
             $conn = null;
             return true;
         }

@@ -8,9 +8,9 @@ class Student_Course
     {
         try {
             $conn = connect();
-            $q = $conn->query("SELECT S.sid, S.name, SC.grade FROM Students AS S 
-                                         JOIN Student_Course AS SC ON S.sid=SC.sid
-                                         WHERE SC.cid='$cid' ORDER BY S.sid");
+            $q = $conn->query("SELECT U.uid, U.name, SC.grade FROM Users AS U 
+                                         JOIN Student_Course AS SC ON U.uid=SC.sid
+                                         WHERE SC.cid='$cid' ORDER BY U.uid");
             $rows = $q->fetchAll();
             $conn = null;
             return $rows;

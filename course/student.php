@@ -43,9 +43,9 @@ function list_student($cid)
         //foreach ($list_results as $row) {
             $row = $list_results[$i];
             echo '<tr>';
-            echo '<td>' . $row['sid'] . '</td>';
+            echo '<td>' . $row['uid'] . '</td>';
             echo '<td>' . $row['name'] . '</td>';
-            echo '<td><select name="grade_'.$row['sid'].'">';
+            echo '<td><select name="grade_'.$row['uid'].'">';
             foreach ($grade_enum as $g)
             {
                 if ($g == $row['grade'])
@@ -59,7 +59,7 @@ function list_student($cid)
             echo '<td>'.$list_avg[$i]['avg'].'</td>';
             echo '<td>
                 <button type="button" class="btn btn-danger"
-                        onclick="delStudent(\'' . $row['sid'] . '\',\'' . $cid . '\')">Delete</button>
+                        onclick="delStudent(\'' . $row['uid'] . '\',\'' . $cid . '\')">Delete</button>
               </td>';
             echo '</tr>';
         }

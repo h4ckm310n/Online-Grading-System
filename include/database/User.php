@@ -9,10 +9,14 @@ class User
             $conn = connect();
             switch ($role) {
                 case 1:
-                    $s = "SELECT COUNT(*) as N, tid, name FROM Teachers WHERE tid=? AND password=?";
+                    $s = "SELECT COUNT(*) as N, T.tid, name FROM Teachers AS T
+                          JOIN Users AS U ON T.tid=U.uid
+                          WHERE T.tid=? AND U.password=?";
                     break;
                 case 2:
-                    $s = "SELECT COUNT(*) as N, sid, name FROM Students WHERE sid=? AND password=?";
+                    $s = "SELECT COUNT(*) as N, S.sid, name FROM Students AS S
+                          JOIN Users AS U ON S.sid=U.uid
+                          WHERE S.sid=? AND U.password=?";
                     break;
                 default:
                     $s = "";
@@ -39,33 +43,17 @@ class User
         }
     }
 
-    public static function update($uid, $name, $pwd, $phone, $email, $office, $role)
+    public static function update($uid, $name, $pwd, $phone, $email)
     {
         try {
             $conn = connect();
             //update
-            switch ($role) {
-                case 1:
-                    $s = "UPDATE Teachers SET name=?, password=?, phone=?, email=?, office=? WHERE tid=?";
-                    break;
-                case 2:
-                    $s = "UPDATE Students SET name=?, password=?, phone=?, email=? WHERE sid=?";
-                    break;
-                default:
-                    $s = "";
-                    break;
-            }
-            $q = $conn->prepare($s);
+            $q = $conn->prepare("UPDATE Users SET name=?, password=?, phone=?, email=? WHERE uid=?");
             $q->bindParam(1, $name);
             $q->bindParam(2, $pwd);
             $q->bindParam(3, $phone);
             $q->bindParam(4, $email);
-            if ($role == 1) {
-                $q->bindParam(5, $office);
-                $q->bindParam(6, $uid);
-            }
-            else
-                $q->bindParam(5, $uid);
+            $q->bindParam(5, $uid);
             $q->execute();
             $conn = null;
             $_SESSION['uname'] = $name;
@@ -78,22 +66,11 @@ class User
         }
     }
 
-    public static function select_by_uid($uid, $role)
+    public static function select_by_uid($uid)
     {
         try {
             $conn = connect();
-            switch ($role) {
-                case 1:
-                    $s = "SELECT * FROM Teachers WHERE tid=?";
-                    break;
-                case 2:
-                    $s = "SELECT * FROM Students WHERE sid=?";
-                    break;
-                default:
-                    $s = "";
-                    break;
-            }
-            $q = $conn->prepare($s);
+            $q = $conn->prepare("SELECT * FROM Users WHERE uid=?");
             $q->bindParam(1, $uid);
             $q->execute();
             $row = $q->fetch();
