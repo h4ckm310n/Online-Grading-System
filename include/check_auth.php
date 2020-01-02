@@ -14,7 +14,7 @@ function check_auth()
 function end_page()
 {
     //terminate
-    echo "\nYou don't have the authority to visit this page.";
+    header("Location: http://".$_SERVER['HTTP_HOST']);
     die();
 }
 ?>

@@ -1,6 +1,7 @@
 <?php
 require_once "db_connect.php";
 require_once "Student_Assignment.php";
+require_once "Assignment.php";
 
 class Student_Course
 {
@@ -49,9 +50,9 @@ class Student_Course
             $q = $conn->prepare("INSERT INTO Student_Course (sid, cid) VALUES (?, ?)");
             $q->bindParam(1, $sid);
             $q->bindParam(2, $cid);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {
@@ -68,14 +69,15 @@ class Student_Course
             $q->bindParam(1, $grade);
             $q->bindParam(2, $sid);
             $q->bindParam(3, $cid);
+            $r = true;
             for ($i=0; $i<count($sids); ++$i)
             {
                 $sid = $sids[$i];
                 $grade = $grades[$i];
-                $q->execute();
+                $r = $q->execute();
             }
             $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {
@@ -88,47 +90,16 @@ class Student_Course
     {
         try {
             $conn = connect();
-            $q = $conn->prepare("DELETE FROM Student_Course WHERE sid=? AND cid=?");
+            $q = $conn->prepare("DELETE SC, SA, SQ FROM Student_Course AS SC
+                                           JOIN Assignments AS A ON SC.cid=A.cid
+                                           JOIN Student_Assignment AS SA ON A.aid=SA.aid AND SC.sid=SA.sid
+                                           JOIN Student_Question AS SQ ON SQ.aid=SA.aid AND SC.sid=SQ.sid 
+                                           WHERE SC.sid=? AND SC.cid=?");
             $q->bindParam(1, $sid);
             $q->bindParam(2, $cid);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
-            return true;
-        }
-        catch (PDOException $e)
-        {
-            $conn = null;
-            return false;
-        }
-    }
-
-    public static function delete_by_cid($cid)
-    {
-        try {
-            $conn = connect();
-            $q = $conn->prepare("DELETE FROM Student_Course WHERE cid=?");
-            $q->bindParam(1, $cid);
-            $q->execute();
-            $conn = null;
-            return true;
-        }
-        catch (PDOException $e)
-        {
-            $conn = null;
-            return false;
-        }
-    }
-
-    public static function delete_by_sid($sid)
-    {
-        try {
-            $conn = connect();
-            Student_Assignment::delete_by_sid($conn, $sid);
-            $q = $conn->prepare("DELETE FROM Student_Course WHERE sid=?");
-            $q->bindParam(1, $sid);
-            $q->execute();
-            $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {

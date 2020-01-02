@@ -104,11 +104,11 @@ class Assignment
             $q->bindParam(2, $cid);
             $q->bindParam(3, $title);
             $q->bindParam(4, $deadline);
-            $q->execute();
-            Student_Assignment::add_student_record($conn, $aid, $cid);
-            Question::add_questions($conn, $aid, $contents, $weights);
+            $r = $q->execute();
+            $r2 = Student_Assignment::add_student_record($conn, $aid);
+            $r3 = Question::add_questions($conn, $aid, $contents, $weights);
             $conn = null;
-            return true;
+            return ($r && $r2 && $r3);
         }
         catch (PDOException $e)
         {
@@ -121,36 +121,11 @@ class Assignment
     {
         try {
             $conn = connect();
-            Student_Assignment::delete_by_aid($conn, $aid);
-            Question::delete_by_aid($conn, $aid);
             $q = $conn->prepare("DELETE FROM Assignments WHERE aid=?");
             $q->bindParam(1, $aid);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
-            return true;
-        }
-        catch (PDOException $e)
-        {
-            $conn = null;
-            return false;
-        }
-    }
-
-    public static function delete_by_cid($cid)
-    {
-        try {
-            $conn = connect();
-            $aids = self::select_by_course($cid);
-            foreach ($aids as $a_rows)
-            {
-                Student_Assignment::delete_by_aid($conn, $a_rows['aid']);
-                Question::delete_by_aid($conn, $a_rows['aid']);
-            }
-            $q = $conn->prepare("DELETE FROM Assignments WHERE cid=?");
-            $q->bindParam(1, $cid);
-            $q->execute();
-            $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {
@@ -167,9 +142,9 @@ class Assignment
             $q->bindParam(1, $title);
             $q->bindParam(2, $deadline);
             $q->bindParam(3, $aid);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {

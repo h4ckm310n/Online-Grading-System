@@ -15,33 +15,16 @@ class Question
             $q->bindParam(2, $aid);
             $q->bindParam(3, $content);
             $q->bindParam(4, $weight);
+            $r = true;
             for ($i=0; $qid<count($contents); $i++)
             {
                 $qid = $i + 1;
                 $content = $contents[$i];
                 $weight = $weights[$i];
-                $q->execute();
-                Student_Question::add_student_record($conn, $aid, $qid);
+                $r = $q->execute();
             }
-
-        }
-        catch (PDOException $e)
-        {
-            return false;
-        }
-    }
-
-    public static function delete_by_aid($conn, $aid)
-    {
-        try
-        {
-            if ($conn == null)
-                $conn = connect();
-            Student_Question::delete_by_aid($conn, $aid);
-            $q = $conn->prepare("DELETE FROM Questions WHERE aid=?");
-            $q->bindParam(1, $aid);
-            $q->execute();
-            return true;
+            $r2 = Student_Question::add_student_record($conn, $aid);
+            return ($r && $r2);
         }
         catch (PDOException $e)
         {

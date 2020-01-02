@@ -4,55 +4,19 @@ require_once "Student_Assignment.php";
 
 class Student_Question
 {
-    public static function add_student_record($conn, $aid, $qid)
+    public static function add_student_record($conn, $aid)
     {
         try
         {
             if ($conn == null)
                 $conn = connect();
-            $s_rows = Student_Assignment::select_by_assignment($aid);
-            $q = $conn->prepare("INSERT INTO Student_Question(sid, qid, aid) VALUES(?, ?, ?)");
-            $q->bindParam(1, $sid);
-            $q->bindParam(2, $qid);
-            $q->bindParam(3, $aid);
-            foreach ($s_rows as $row)
-            {
-                $sid = $row['uid'];
-                $q->execute();
-            }
-            return true;
-        }
-        catch (PDOException $e)
-        {
-            return false;
-        }
-    }
-
-    public static function delete_by_aid($conn, $aid)
-    {
-        try {
-            if ($conn == null)
-                $conn = connect();
-            $q = $conn->prepare("DELETE FROM Student_Question WHERE aid=?");
+            $q = $conn->prepare("INSERT INTO Student_Question(sid, qid, aid)
+                                           SELECT SA.sid, Q.qid, Q.aid FROM Student_Assignment AS SA
+                                           JOIN Questions AS Q ON SA.aid=Q.aid
+                                           WHERE SA.aid=?");
             $q->bindParam(1, $aid);
-            $q->execute();
-            return true;
-        }
-        catch (PDOException $e)
-        {
-            return false;
-        }
-    }
-
-    public static function delete_by_sid($conn, $sid)
-    {
-        try {
-            if ($conn == null)
-                $conn = connect();
-            $q = $conn->prepare("DELETE FROM Student_Question WHERE sid=?");
-            $q->bindParam(1, $sid);
-            $q->execute();
-            return true;
+            $r = $q->execute();
+            return $r;
         }
         catch (PDOException $e)
         {
@@ -92,13 +56,14 @@ class Student_Question
             $q->bindParam(2, $qid);
             $q->bindParam(3, $aid);
             $q->bindParam(4, $sid);
+            $r = true;
             for ($i=0; $i<count($qids); ++$i)
             {
                 $qid = $qids[$i];
                 $ans = $answers[$i];
-                $q->execute();
+                $r = $q->execute();
             }
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {
@@ -117,13 +82,14 @@ class Student_Question
             $q->bindParam(2, $sid);
             $q->bindParam(3, $aid);
             $q->bindParam(4, $qid);
+            $r = true;
             for ($i=0; $i<count($qids); ++$i)
             {
                 $qid = $qids[$i];
                 $mark = $qmarks[$i];
-                $q->execute();
+                $r = $q->execute();
             }
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {

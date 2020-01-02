@@ -42,15 +42,15 @@ class Student
             }
 
             //insert
-            $q = $conn->prepare("INSERT INTO Users(uid, password, name, phone, email) VALUES (?, ?, ?, ?, ?)");
+            $q = $conn->prepare("INSERT INTO Users(uid, password, name, phone, email, role) VALUES (?, ?, ?, ?, ?, 2)");
             $q->bindParam(1, $sid);
             $q->bindParam(2, $pwd);
             $q->bindParam(3, $name);
             $q->bindParam(4, $phone);
             $q->bindParam(5, $email);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {
@@ -63,12 +63,11 @@ class Student
     {
         try {
             $conn = connect();
-            Student_Course::delete_by_sid($sid);
             $q = $conn->prepare("DELETE FROM Users WHERE uid=?");
             $q->bindParam(1, $sid);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {

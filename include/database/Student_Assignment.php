@@ -5,59 +5,19 @@ require_once "Student_Question.php";
 
 class Student_Assignment
 {
-    public static function add_student_record($conn, $aid, $cid)
+    public static function add_student_record($conn, $aid)
     {
         try {
             if ($conn == null)
                 $conn = connect();
-            $students = Student_Course::select_by_course($cid);
-            $q = $conn->prepare("INSERT INTO Student_Assignment (sid, aid) VALUES (?, ?)");
-            $q->bindParam(1, $sid);
-            $q->bindParam(2, $aid);
-            foreach ($students as $s_row)
-            {
-                $sid = $s_row['uid'];
-                $q->execute();
-            }
-            return true;
-        }
-        catch (PDOException $e)
-        {
-            return false;
-        }
-    }
-
-    public static function delete_by_sid($conn, $sid)
-    {
-        try {
-            if ($conn == null)
-                $conn = connect();
-            Student_Question::delete_by_sid($conn, $sid);
-            $q = $conn->prepare("DELETE FROM Student_Assignment WHERE sid=?");
-            $q->bindParam(1, $sid);
-            $q->execute();
-            $conn = null;
-            return true;
-        }
-        catch (PDOException $e)
-        {
-            $conn = null;
-            return false;
-        }
-    }
-
-    public static function delete_by_aid($conn, $aid)
-    {
-        try {
-            if ($conn == null)
-                $conn = connect();
-            $q = $conn->prepare("DELETE FROM Student_Assignment WHERE aid=?");
+            $q = $conn->prepare("INSERT INTO Student_Assignment (sid, aid)
+                                           SELECT SC.sid, A.aid FROM Student_Course AS SC
+                                           JOIN Assignments AS A ON SC.cid=A.cid
+                                           WHERE A.aid=?");
             $q->bindParam(1, $aid);
-            $q->execute();
-            return true;
-        }
-        catch (PDOException $e)
-        {
+            $r = $q->execute();
+            return $r;
+        } catch (PDOException $e) {
             return false;
         }
     }
@@ -66,16 +26,15 @@ class Student_Assignment
     {
         try {
             $conn = connect();
-            $q = $conn->query("SELECT U.uid, U.name, SA.mark, IFNULL(SA.submit_date, 'NULL') AS submit_date 
+            $q = $conn->query("SELECT U.uid, U.name, SA.mark, SA.submit_date
                                          FROM Users AS U 
                                          JOIN Student_Assignment AS SA ON U.uid=SA.sid
-                                         WHERE SA.aid='$aid' ORDER BY U.uid");
+                                         WHERE SA.aid='$aid' AND SA.submit_date IS NOT NULL 
+                                         ORDER BY U.uid");
             $rows = $q->fetchAll();
             $conn = null;
             return $rows;
-        }
-        catch (PDOException $e)
-        {
+        } catch (PDOException $e) {
             $conn = null;
             return false;
         }
@@ -83,8 +42,7 @@ class Student_Assignment
 
     public static function select_by_aid_sid($aid, $sid)
     {
-        try
-        {
+        try {
             $conn = connect();
             $q = $conn->prepare("SELECT A.aid, A.title, A.deadline,
                                            SA.comment, SA.mark, SA.submit_date 
@@ -96,17 +54,14 @@ class Student_Assignment
             $q->bindParam(2, $sid);
             $q->execute();
             return $q->fetch();
-        }
-        catch (PDOException $e)
-        {
+        } catch (PDOException $e) {
             return false;
         }
     }
 
     public static function select_by_sid_cid($sid, $cid)
     {
-        try
-        {
+        try {
             $conn = connect();
             $q = $conn->prepare("SELECT SA.aid, SA.mark, A.title
                                            FROM Student_Assignment AS SA 
@@ -117,34 +72,28 @@ class Student_Assignment
             $q->bindParam(2, $sid);
             $q->execute();
             return $q->fetchAll();
-        }
-        catch (PDOException $e)
-        {
+        } catch (PDOException $e) {
             return false;
         }
     }
 
     public static function select_avg_by_sid($sid, $cid)
     {
-        try
-        {
+        try {
             $conn = connect();
             $q = $conn->query("SELECT AVG(SA.mark) AS avg FROM Student_Assignment AS SA
                                          JOIN Assignments AS A ON SA.aid=A.aid
                                          WHERE A.cid='$cid' AND SA.sid='$sid'");
             $conn = null;
             return $q->fetch();
-        }
-        catch (PDOException $e)
-        {
+        } catch (PDOException $e) {
             return false;
         }
     }
 
     public static function select_avg($cid)
     {
-        try
-        {
+        try {
             $conn = connect();
             $q = $conn->query("SELECT AVG(SA.mark) AS avg FROM Student_Assignment AS SA 
                                          JOIN Assignments AS A ON SA.aid=A.aid 
@@ -152,34 +101,29 @@ class Student_Assignment
                                          GROUP BY(SA.sid)");
             $conn = null;
             return $q->fetchAll();
-        }
-        catch (PDOException $e)
-        {
+        } catch (PDOException $e) {
             return false;
         }
     }
 
     public static function update($aid, $sid, $qids, $answers, $date, $submit)
     {
-        try
-        {
+        try {
             //update answers
             $conn = connect();
-            Student_Question::update($conn, $aid, $sid, $qids, $answers);
-            if ($submit == 1)
-            {
+            $r1 = Student_Question::update($conn, $aid, $sid, $qids, $answers);
+            $r = true;
+            if ($submit == 1) {
                 //submit
                 $q = $conn->prepare("UPDATE Student_Assignment SET submit_date=? WHERE aid=? AND sid=?");
                 $q->bindParam(1, $date);
                 $q->bindParam(2, $aid);
                 $q->bindParam(3, $sid);
-                $q->execute();
+                $r = $q->execute();
             }
             $conn = null;
-            return true;
-        }
-        catch (PDOException $e)
-        {
+            return ($r1 && $r);
+        } catch (PDOException $e) {
             $conn = null;
             return false;
         }
@@ -195,13 +139,11 @@ class Student_Assignment
             $q->bindParam(2, $comment);
             $q->bindParam(3, $sid);
             $q->bindParam(4, $aid);
-            $q->execute();
-            Student_Question::marks($conn, $sid, $aid, $qids, $qmarks);
+            $r = $q->execute();
+            $r1 = Student_Question::marks($conn, $sid, $aid, $qids, $qmarks);
             $conn = null;
-            return true;
-        }
-        catch (PDOException $e)
-        {
+            return ($r && $r1);
+        } catch (PDOException $e) {
             $conn = null;
             return false;
         }

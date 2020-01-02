@@ -22,10 +22,6 @@ function list_student($aid)
         </tr>
         <?php
         foreach ($list_results as $row) {
-            if ($row['submit_date'] == 'NULL') {
-                //if not submitted, do not show
-                continue;
-            }
             echo '<tr>';
             echo '<td>' . $row['uid'] . '</td>';
             echo '<td>' . $row['name'] . '</td>';

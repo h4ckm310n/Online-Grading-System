@@ -68,13 +68,14 @@ function list_student($cid)
     <?php
 }
 
-function add_student($sid, $cid)
+function add_student($sid, $cid, $by)
 {
     //add student to course
+    $s = $by == 1 ? "add student" : "enroll course";
     if (Student_Course::add($sid, $cid))
-        echo "Succeeded to add student";
+        echo "Succeeded to ".$s;
     else
-        echo "Failed to add student";
+        echo "Failed to ".$s;
 }
 
 function del_student($sid, $cid)
@@ -129,7 +130,7 @@ if ($_POST['mode'] == 1)
     list_student($_POST['cid']);
 
 else if ($_POST['mode'] == 2)
-    add_student($_POST['sid'], $_POST['cid']);
+    add_student($_POST['sid'], $_POST['cid'], $_POST['by']);
 
 else if ($_POST['mode'] == 3)
     del_student($_POST['sid'], $_POST['cid']);

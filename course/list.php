@@ -11,7 +11,7 @@ if (check_auth() == 1)
     //courses taught by current teacher account
     $list_results = Course::select_by_teacher();
 else
-    //courses taken by current student account
+    //all courses
     $list_results = Course::select_by_student();
 ?>
 <html>
@@ -43,6 +43,10 @@ display_header();
         <tr>
             <th>Course ID</th>
             <th>Name</th>
+            <?php
+            if ($_SESSION['urole'] == 2)
+                echo '<th>Teacher</th>';
+            ?>
             <th>Operation</th>
         </tr>
         <?php
@@ -72,17 +76,32 @@ display_header();
                 } else {
                     //student
                     ?>
-                    <td>
-                        <a href="../assignment/list.php?cid=<?php echo $row['cid'] ?>" target="_blank">
-                            <button type="button" class="btn btn-primary">Assignment</button>
-                        </a>
-                        <button type="button" class="btn btn-primary"
-                                onclick="viewGrade('<?php echo $_SESSION['uid']; ?>', '<?php echo $row['cid']; ?>')">
-                            Grade
-                        </button>
-                    </td>
-
+                    <td><?php echo $row['teacher']; ?></td>
                     <?php
+                    if ($row['taken'] == 1) {
+                        //course is taken by student
+                        ?>
+                        <td>
+                            <a href="../assignment/list.php?cid=<?php echo $row['cid'] ?>" target="_blank">
+                                <button type="button" class="btn btn-primary">Assignment</button>
+                            </a>
+                            <button type="button" class="btn btn-primary"
+                                    onclick="viewGrade('<?php echo $_SESSION['uid']; ?>', '<?php echo $row['cid']; ?>')">
+                                Grade
+                            </button>
+                        </td>
+
+                        <?php
+                    }
+                    else
+                    {
+                        ?>
+                        <td><button type="button" class="btn btn-primary"
+                                    onclick="enroll('<?php  echo $row['cid']; ?>')">
+                                Enroll
+                            </button></td>
+                        <?php
+                    }
                 }
                 ?>
             </tr>
@@ -198,6 +217,7 @@ if (check_auth() == 1) {
                 {
                     cid: cid,
                     sid: $("#add_sid").val(),
+                    by: 1,
                     mode: 2
                 },
                 function(data, status)
@@ -281,6 +301,25 @@ else
                     $('#grade_modal').modal('show');
                 }
             );
+        }
+
+        function enroll(cid) {
+            //enroll course
+            var flag = confirm("Confirm to enroll");
+            if (flag) {
+                $.post("student.php",
+                    {
+                        cid: cid,
+                        sid: '<?php echo $_SESSION['uid'] ?>',
+                        by: 2,
+                        mode: 2
+                    },
+                    function (data, status) {
+                        alert(data);
+                        location.reload();
+                    }
+                );
+            }
         }
     </script>
     <?php

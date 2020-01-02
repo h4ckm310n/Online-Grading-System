@@ -24,10 +24,11 @@ class Course
     {
         try {
             $conn = connect();
-            $q = $conn->query("SELECT C.cid, C.name FROM Courses AS C
-                                         JOIN Student_Course AS SC
-                                         ON C.cid=SC.cid
-                                         WHERE SC.sid='" . $_SESSION['uid'] . "'");
+            $q = $conn->query("SELECT C.cid, C.name, U.name AS teacher, IF(SC.sid IS NULL, 0, 1) AS taken 
+                                         FROM Courses AS C
+                                         JOIN Users AS U ON C.tid=U.uid
+                                         LEFT JOIN Student_Course AS SC ON C.cid=SC.cid
+                                         AND SC.sid='" . $_SESSION['uid'] . "'");
             $conn = null;
             return $q->fetchAll();
         }
@@ -46,9 +47,9 @@ class Course
             $q->bindParam(1, $cid);
             $q->bindParam(2, $name);
             $q->bindParam(3, $tid);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {
@@ -61,13 +62,11 @@ class Course
     {
         try {
             $conn = connect();
-            Student_Course::delete_by_cid($cid);
-            Assignment::delete_by_cid($cid);
             $q = $conn->prepare("DELETE FROM Courses WHERE cid=?");
             $q->bindParam(1, $cid);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {

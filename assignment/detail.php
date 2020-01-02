@@ -50,8 +50,10 @@ function student_view($aid)
         </div>
         <hr>
         <div>
+            <b style="font-size: 16px">Comment: </b><br>
             <pre style="font-size: 15px"><?php echo $sa['comment']; ?></pre>
         </div>
+        <hr>
     </div>
     <div>
         <?php

@@ -40,10 +40,10 @@ class User
             $q->bindParam(3, $phone);
             $q->bindParam(4, $email);
             $q->bindParam(5, $uid);
-            $q->execute();
+            $r = $q->execute();
             $conn = null;
             $_SESSION['uname'] = $name;
-            return true;
+            return $r;
         }
         catch (PDOException $e)
         {
